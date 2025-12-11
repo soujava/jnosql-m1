@@ -16,6 +16,8 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.stream.Stream;
+
 
 @EnableAutoWeld
 @AddPackages(value = {Database.class, EntityConverter.class, DocumentTemplate.class, MongoDBTemplate.class})
@@ -43,10 +45,38 @@ class NoSQLAPITest {
                 .underMaintenance(false)
                 .build();
 
-        Room insert = template.insert(room);
+        template.insert(room);
 
-        template.select(Room.class).where()
+        Stream<Room> rooms = template.select(Room.class).where(_Room.TYPE).eq(RoomType.SUITE).stream();
 
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(rooms).isNotNull();
+            softly.assertThat(rooms.count()).isEqualTo(1);
+        });
+    }
+
+    void shouldExecuteQueryAPI() {
+        Room room = new RoomBuilder()
+                .id("room-1")
+                .roomNumber(101)
+                .type(RoomType.SUITE)
+                .status(RoomStatus.AVAILABLE)
+                .cleanStatus(CleanStatus.CLEAN)
+                .smokingAllowed(false)
+                .underMaintenance(false)
+                .build();
+
+        template.insert(room);
+
+        Stream<Room> rooms = template.select(Room.class)
+                .where(_Room.TYPE).eq(RoomType.SUITE)
+                .and(_Room.STATUS).eq(RoomStatus.AVAILABLE)
+                .stream();
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(rooms).isNotNull();
+            softly.assertThat(rooms.count()).isEqualTo(1);
+        });
     }
 
 }
