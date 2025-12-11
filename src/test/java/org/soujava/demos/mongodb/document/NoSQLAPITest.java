@@ -1,6 +1,7 @@
 package org.soujava.demos.mongodb.document;
 
 import jakarta.inject.Inject;
+import jakarta.nosql.Query;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.eclipse.jnosql.databases.mongodb.mapping.MongoDBTemplate;
@@ -20,6 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 
@@ -97,6 +99,19 @@ class NoSQLAPITest {
                 .count();
 
         Assertions.assertThat(count).isEqualTo(1);
+    }
+
+    @ParameterizedTest
+    @MethodSource("roomsProvider")
+    void shouldExecuteQuery(Room room) {
+        template.insert(room);
+        Query query = template.query("FROM Room where type =:type and status = :status");
+        query.bind("type", RoomType.SUITE);
+        query.bind("status", RoomStatus.AVAILABLE);
+
+        List<Room> result = query.result();
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.size()).isEqualTo(1);
     }
 
 }
