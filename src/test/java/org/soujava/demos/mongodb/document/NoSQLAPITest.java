@@ -128,4 +128,18 @@ class NoSQLAPITest {
         Assertions.assertThat(result.size()).isEqualTo(1);
     }
 
+    @ParameterizedTest
+    @MethodSource("roomsProvider")
+    void shouldExecuteTypeSafeQueryWithProjection(Room room) {
+        template.insert(room);
+        TypedQuery<RoomSummary> query = template.typedQuery("FROM Room where type =:type and status = :status",
+                RoomSummary.class);
+        query.bind("type", RoomType.SUITE);
+        query.bind("status", RoomStatus.AVAILABLE);
+
+        List<RoomSummary> result = query.result();
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.size()).isEqualTo(1);
+    }
+
 }
