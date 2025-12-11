@@ -52,4 +52,86 @@ class NoSQLAPITest {
     }
 
 
+    @ParameterizedTest(name = "Should be able to execute fluent API to create and insert a Room document")
+    @MethodSource("roomsProvider")
+    void shouldExecuteFluentAPI(Room room) {
+        template.insert(room);
+
+        Stream<Room> rooms = template.select(Room.class).where(_Room.TYPE).eq(RoomType.SUITE).stream();
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(rooms).isNotNull();
+            softly.assertThat(rooms.count()).isEqualTo(1);
+        });
+    }
+
+    @ParameterizedTest(name = "Should be able to execute Query API to create and insert a Room document")
+    @MethodSource("roomsProvider")
+    void shouldExecuteQueryAPI(Room room) {
+        template.insert(room);
+
+        Stream<Room> rooms = template.select(Room.class)
+                .where(_Room.TYPE).eq(RoomType.SUITE)
+                .and(_Room.STATUS).eq(RoomStatus.AVAILABLE)
+                .stream();
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(rooms).isNotNull();
+            softly.assertThat(rooms.count()).isEqualTo(1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("roomsProvider")
+    void shouldCount(Room room) {
+        template.insert(room);
+        long count = template.select(Room.class)
+                .where(_Room.TYPE).eq(RoomType.SUITE)
+                .and(_Room.STATUS).eq(RoomStatus.AVAILABLE)
+                .count();
+
+        Assertions.assertThat(count).isEqualTo(1);
+    }
+
+    @ParameterizedTest
+    @MethodSource("roomsProvider")
+    void shouldExecuteQuery(Room room) {
+        template.insert(room);
+        Query query = template.query("FROM Room where type =:type and status = :status");
+        query.bind("type", RoomType.SUITE);
+        query.bind("status", RoomStatus.AVAILABLE);
+
+        List<Room> result = query.result();
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.size()).isEqualTo(1);
+    }
+
+    @ParameterizedTest
+    @MethodSource("roomsProvider")
+    void shouldExecuteTypeSafeQuery(Room room) {
+        template.insert(room);
+        TypedQuery<Room> query = template.typedQuery("where type =:type and status = :status", Room.class);
+        query.bind("type", RoomType.SUITE);
+        query.bind("status", RoomStatus.AVAILABLE);
+
+        List<Room> result = query.result();
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.size()).isEqualTo(1);
+    }
+
+    @ParameterizedTest
+    @MethodSource("roomsProvider")
+    void shouldExecuteTypeSafeQueryWithProjection(Room room) {
+        template.insert(room);
+        TypedQuery<RoomSummary> query = template.typedQuery("FROM Room where type =:type and status = :status",
+                RoomSummary.class);
+        query.bind("type", RoomType.SUITE);
+        query.bind("status", RoomStatus.AVAILABLE);
+
+        List<RoomSummary> result = query.result();
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.size()).isEqualTo(1);
+    }
+
+
 }
