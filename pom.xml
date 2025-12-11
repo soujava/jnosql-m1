@@ -46,6 +46,12 @@
             <version>${jnosql.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.jnosql.metamodel</groupId>
+            <artifactId>mapping-metamodel-processor</artifactId>
+            <version>${jnosql.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-shaded</artifactId>
             <version>${weld.se.core.version}</version>
