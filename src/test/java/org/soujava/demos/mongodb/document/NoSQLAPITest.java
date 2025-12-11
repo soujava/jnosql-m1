@@ -2,6 +2,7 @@ package org.soujava.demos.mongodb.document;
 
 import jakarta.inject.Inject;
 import jakarta.nosql.Query;
+import jakarta.nosql.TypedQuery;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.eclipse.jnosql.databases.mongodb.mapping.MongoDBTemplate;
@@ -106,6 +107,19 @@ class NoSQLAPITest {
     void shouldExecuteQuery(Room room) {
         template.insert(room);
         Query query = template.query("FROM Room where type =:type and status = :status");
+        query.bind("type", RoomType.SUITE);
+        query.bind("status", RoomStatus.AVAILABLE);
+
+        List<Room> result = query.result();
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.size()).isEqualTo(1);
+    }
+
+    @ParameterizedTest
+    @MethodSource("roomsProvider")
+    void shouldExecuteTypeSafeQuery(Room room) {
+        template.insert(room);
+        TypedQuery<Room> query = template.typedQuery("where type =:type and status = :status", Room.class);
         query.bind("type", RoomType.SUITE);
         query.bind("status", RoomStatus.AVAILABLE);
 
