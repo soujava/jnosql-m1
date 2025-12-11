@@ -1,6 +1,7 @@
 package org.soujava.demos.mongodb.document;
 
 import jakarta.inject.Inject;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.eclipse.jnosql.databases.mongodb.mapping.MongoDBTemplate;
 import org.eclipse.jnosql.mapping.Database;
@@ -70,7 +71,7 @@ class NoSQLAPITest {
         });
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Should be able to execute Query API to create and insert a Room document")
     @MethodSource("roomsProvider")
     void shouldExecuteQueryAPI(Room room) {
         template.insert(room);
@@ -84,6 +85,18 @@ class NoSQLAPITest {
             softly.assertThat(rooms).isNotNull();
             softly.assertThat(rooms.count()).isEqualTo(1);
         });
+    }
+
+    @ParameterizedTest
+    @MethodSource("roomsProvider")
+    void shouldCount(Room room) {
+        template.insert(room);
+        long count = template.select(Room.class)
+                .where(_Room.TYPE).eq(RoomType.SUITE)
+                .and(_Room.STATUS).eq(RoomStatus.AVAILABLE)
+                .count();
+
+        Assertions.assertThat(count).isEqualTo(1);
     }
 
 }
