@@ -51,19 +51,9 @@ class NoSQLAPITest {
                 .build()));
     }
 
-    @Test
-    @DisplayName("Should be able to execute fluent API to create and insert a Room document")
-    void shouldExecuteFluentAPI() {
-        Room room = new RoomBuilder()
-                .id("room-1")
-                .roomNumber(101)
-                .type(RoomType.SUITE)
-                .status(RoomStatus.AVAILABLE)
-                .cleanStatus(CleanStatus.CLEAN)
-                .smokingAllowed(false)
-                .underMaintenance(false)
-                .build();
-
+    @ParameterizedTest(name = "Should be able to execute fluent API to create and insert a Room document")
+    @MethodSource("roomsProvider")
+    void shouldExecuteFluentAPI(Room room) {
         template.insert(room);
 
         Stream<Room> rooms = template.select(Room.class).where(_Room.TYPE).eq(RoomType.SUITE).stream();
