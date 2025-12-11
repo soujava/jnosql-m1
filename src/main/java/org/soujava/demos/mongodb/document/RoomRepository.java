@@ -27,6 +27,7 @@ public interface RoomRepository {
 
     @Save
     Room newRoom(Room room);
+
     void deleteBy();
 
     @Query("WHERE type = :type")
