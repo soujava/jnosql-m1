@@ -13,9 +13,9 @@
          xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.soujava.demos.mongodb</groupId>
-    <artifactId>data-driven-test</artifactId>
+    <artifactId>jakarta-nosql-m1</artifactId>
     <version>1.0.0</version>
-    <name>JNoSQL Demo using Java SE MongoDB exploring Data Driven Test</name>
+    <name>JNoSQL Demo using the new Jakarta NoSQL API</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
