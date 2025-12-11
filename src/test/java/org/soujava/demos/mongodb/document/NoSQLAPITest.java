@@ -15,6 +15,9 @@ import org.jboss.weld.junit5.auto.AddPackages;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
@@ -31,6 +34,18 @@ class NoSQLAPITest {
 
     @Inject
     private DocumentTemplate template;
+
+    public static Stream<Arguments> roomsProvider() {
+        return Stream.of(Arguments.of(new RoomBuilder()
+                .id("room-1")
+                .roomNumber(101)
+                .type(RoomType.SUITE)
+                .status(RoomStatus.AVAILABLE)
+                .cleanStatus(CleanStatus.CLEAN)
+                .smokingAllowed(false)
+                .underMaintenance(false)
+                .build()));
+    }
 
     @Test
     @DisplayName("Should be able to execute fluent API to create and insert a Room document")
@@ -55,17 +70,9 @@ class NoSQLAPITest {
         });
     }
 
-    void shouldExecuteQueryAPI() {
-        Room room = new RoomBuilder()
-                .id("room-1")
-                .roomNumber(101)
-                .type(RoomType.SUITE)
-                .status(RoomStatus.AVAILABLE)
-                .cleanStatus(CleanStatus.CLEAN)
-                .smokingAllowed(false)
-                .underMaintenance(false)
-                .build();
-
+    @ParameterizedTest
+    @MethodSource("roomsProvider")
+    void shouldExecuteQueryAPI(Room room) {
         template.insert(room);
 
         Stream<Room> rooms = template.select(Room.class)
