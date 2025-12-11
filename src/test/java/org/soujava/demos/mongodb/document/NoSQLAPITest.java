@@ -16,6 +16,7 @@ import org.eclipse.jnosql.mapping.semistructured.EntityConverter;
 import org.jboss.weld.junit5.auto.AddExtensions;
 import org.jboss.weld.junit5.auto.AddPackages;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -51,6 +52,10 @@ class NoSQLAPITest {
                 .build()));
     }
 
+    @BeforeEach
+    void setUp() {
+        template.delete(Room.class).execute();
+    }
 
     @ParameterizedTest(name = "Should be able to execute fluent API to create and insert a Room document")
     @MethodSource("roomsProvider")
